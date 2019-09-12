@@ -1,0 +1,66 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "fullName": "Mark5",
+      "contactPreference": "email",
+      "email": "mark@sora.com",
+      "phone": "5641238971",
+      "skills": [
+        {
+          "skillName": "C#",
+          "experienceInYears": "10",
+          "proficiency": "advanced"
+        },
+        {
+          "skillName": "Java",
+          "experienceInYears": "5",
+          "proficiency": "intermediate"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "fullName": "John",
+      "contactPreference": "phone",
+      "email": "john@email.com",
+      "phone": "3242138971",
+      "skills": [
+        {
+          "skillName": "Angular",
+          "experienceInYears": 2,
+          "proficiency": "beginner"
+        },
+        {
+          "skillName": "HTML",
+          "experienceInYears": 2,
+          "proficiency": "intermediate"
+        },
+        {
+          "skillName": "LINQ",
+          "experienceInYears": 3,
+          "proficiency": "advanced"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "fullName": "Sora",
+      "contactPreference": "phone",
+      "email": "rjankathi@sora.com",
+      "phone": "2132629765",
+      "skills": [
+        {
+          "skillName": "c#",
+          "experienceInYears": "10",
+          "proficiency": "intermediate"
+        },
+        {
+          "skillName": "Javascript",
+          "experienceInYears": "10",
+          "proficiency": "intermediate"
+        }
+      ]
+    }
+  ]
+}
