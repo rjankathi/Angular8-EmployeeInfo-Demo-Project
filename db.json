@@ -22,8 +22,8 @@
     {
       "id": 2,
       "fullName": "John",
-      "contactPreference": "phone",
-      "email": "john@email.com",
+      "contactPreference": "email",
+      "email": "john@sora.com",
       "phone": "3242138971",
       "skills": [
         {
