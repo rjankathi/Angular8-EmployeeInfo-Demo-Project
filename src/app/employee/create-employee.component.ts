@@ -5,6 +5,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService } from './employee.service';
 import { IEmployee } from './IEmployee';
 
+import{ RxFormsValidationService } from 'ng-rxforms-validation';
+import { ISkill } from './ISkill';
+
 @Component({
   selector: 'app-create-employee',
   templateUrl: './create-employee.component.html',
@@ -59,7 +62,8 @@ export class CreateEmployeeComponent implements OnInit {
   constructor(private fb:FormBuilder,
     private route:ActivatedRoute,
     private employeeService:EmployeeService,
-    private _router: Router) { }
+    private _router: Router,
+    private _validationMessages:RxFormsValidationService) { }
 
   ngOnInit() { 
     //creating forms using explicitly using new formgroup and new formcontrols
@@ -95,9 +99,10 @@ export class CreateEmployeeComponent implements OnInit {
 
     this.employeeForm.valueChanges.subscribe((data: any)  =>{
        //this.fullNameLength = value.length;
-       this.logValidationErrors(this.employeeForm);
+       //this.logValidationErrors(this.employeeForm);
+       this.validate();
     });
-
+  
     this.route.paramMap.subscribe(params =>{
       const empId = +params.get('id')
       if(empId){
@@ -116,6 +121,7 @@ export class CreateEmployeeComponent implements OnInit {
       }
     })
   }
+
   getEmployee(empId: number) {
      this.employeeService.getEmployee(empId).subscribe((employee:IEmployee) =>{
         {
@@ -125,6 +131,7 @@ export class CreateEmployeeComponent implements OnInit {
         (err:any) => console.log(err);
      });
   }
+
   editEmployee(employee: IEmployee) {
     this.employeeForm.patchValue({
       fullName : employee.fullName,
@@ -139,6 +146,7 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm.setControl('skills',this.setExistingFormGroup(employee.skills))
 
   }
+
   setExistingFormGroup(skillSets: import("./ISkill").ISkill[]): AbstractControl {
     const formArray = new FormArray([]);
     skillSets.forEach(s=>{
@@ -159,6 +167,10 @@ export class CreateEmployeeComponent implements OnInit {
    })
   }
 
+  get skills(): FormArray{
+    return this.employeeForm.get('skills') as FormArray;
+  }
+
   addSkillButtonClick():void{
     (<FormArray>this.employeeForm.get('skills')).push(this.addSkillFormGroup());
   }
@@ -174,35 +186,39 @@ export class CreateEmployeeComponent implements OnInit {
     phoneFormControl.updateValueAndValidity(); //updateValueAndValidity allows you to modify the value of one or 
     //more form controls and the flag allows you to specify if you want this to emit the value to valueChanges subscribers.
   }
+
+  validate(){
+    this._validationMessages.showValidationMessages(this.employeeForm,this.formErrors,this.validationMessages)
+  }
   
-  logValidationErrors(group: FormGroup = this.employeeForm): void{
-    Object.keys(group.controls).forEach((key:string)=>{
-      const abstractControl = group.get(key);
-      this.formErrors[key] = '';
-        if(abstractControl && !abstractControl.valid &&
-          (abstractControl.touched || abstractControl.dirty || abstractControl.value !== '')){
-          const messages = this.validationMessages[key];
+//   logValidationErrors(group: FormGroup = this.employeeForm): void{
+//     Object.keys(group.controls).forEach((key:string)=>{
+//       const abstractControl = group.get(key);
+//       this.formErrors[key] = '';
+//         if(abstractControl && !abstractControl.valid &&
+//           (abstractControl.touched || abstractControl.dirty || abstractControl.value !== '')){
+//           const messages = this.validationMessages[key];
 
-          for (const errorKey in abstractControl.errors){
-            if(errorKey){
-              this.formErrors[key] += messages[errorKey] + ' ';
-            }
-          }
-      }
+//           for (const errorKey in abstractControl.errors){
+//             if(errorKey){
+//               this.formErrors[key] += messages[errorKey] + ' ';
+//             }
+//           }
+//       }
 
-      if(abstractControl instanceof FormGroup){
-        this.logValidationErrors(abstractControl);
-      } 
+//       if(abstractControl instanceof FormGroup){
+//         this.logValidationErrors(abstractControl);
+//       } 
 
-      // if(abstractControl instanceof FormArray){
-      //   for (const control of abstractControl.controls){
-      //     if(control instanceof FormGroup){
-      //       this.logValidationErrors(control);
-      //     }
-      //   }
-      // } 
-  });  
-}
+//       // if(abstractControl instanceof FormArray){
+//       //   for (const control of abstractControl.controls){
+//       //     if(control instanceof FormGroup){
+//       //       this.logValidationErrors(control);
+//       //     }
+//       //   }
+//       // } 
+//   });  
+// }
 
   onSubmit():void{
     this.mapFormValuesToEmployeeModel();
@@ -228,15 +244,18 @@ export class CreateEmployeeComponent implements OnInit {
   }
 
   loadData():void {
-    // this.employeeForm.patchValue({
-    //   fullName: "SoRa Inc.",
-    //   email: "mail@sorainc.com",
-    //   skills:{
-    //       skillName: 'C#',
-    //       experienceInYears:9,
-    //       proficiency:'beginner'
-    //   }
-    // })
+    //const setEmailGroup = this.employeeForm.get('emailGroup').setValue({email: "mail@sorainc.com",confirmEmail: "mail@sorainc.com"});
+    //const setSkills =this.employeeForm.get('skills').setValue({skillName:'c#',experienceInYears:9,proficiency:'beginner'});
+
+    this.employeeForm.patchValue({
+      fullName: "SoRa Inc.",
+      emailGroup:{email: "mail@sorainc.com",confirmEmail: "mail@sorainc.com"},
+      phone:'818-918-9000',
+      //skills: this.setSkills()
+    });
+
+    this.setSkills();
+    
     
     //this.logValidationErrors(this.employeeForm);
     //console.log(this.formErrors)
@@ -257,9 +276,23 @@ export class CreateEmployeeComponent implements OnInit {
     //When to use FormGroup and FormArray?
     //A formarray data is serialized as array where as a formgroup is serialized as an object
     //A Form arraytracks controls as part of an array and is very useful when we want to generate dynamic formgroup and form controls 
-    console.log(formGroup);
+    //console.log(formGroup);
 
   }
+  setSkills() {
+    
+    // this.skills.setValue(
+    //   [
+    //     {skillName: "NodeJs",experienceInYears:"2",proficiency:"beginner"},
+    //     //{skillName: "NodeJs",experienceInYears:"2",proficiency:"beginner"},
+    //   ]);
+    let skill1: ISkill = {
+      skillName :"c#",
+      experienceInYears:10,
+      proficiency:"Pro"
+    }
+    this.skills.setValue([skill1]);
+  } 
 
   removeSkillClick(skillGroupIndex: number):void {
     const skillsFormArray = (<FormArray>this.employeeForm.get('skills'));
